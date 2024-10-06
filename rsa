@@ -1,33 +1,58 @@
 #!/usr/bin/python3
 from sys import argv
 import math
-import time
+import random
 
-def find_factors(num):
-    if num % 2 == 0:
-        return (num // 2, 2)
+# Function to check if a number is prime
+def is_prime(num):
+    if num <= 1:
+        return False
+    if num == 2 or num == 3:
+        return True
+    if num % 2 == 0 or num % 3 == 0:
+        return False
+    for i in range(5, int(math.sqrt(num)) + 1, 6):
+        if num % i == 0 or num % (i + 2) == 0:
+            return False
+    return True
+
+# Pollard's Rho Algorithm for finding a divisor
+def pollards_rho(n):
+    if n % 2 == 0:
+        return 2
+    x = random.randint(2, n - 1)
+    y = x
+    c = random.randint(1, n - 1)
+    d = 1
+    while d == 1:
+        x = (pow(x, 2, n) + c + n) % n
+        y = (pow(y, 2, n) + c + n) % n
+        y = (pow(y, 2, n) + c + n) % n
+        d = math.gcd(abs(x - y), n)
+        if d == n:
+            return pollards_rho(n)
+    return d
+
+# Function to find the prime factors p and q
+def find_prime_factors(n):
+    divisor = pollards_rho(n)
+    p = divisor
+    q = n // divisor
+    # Check if both factors are prime
+    if is_prime(p) and is_prime(q):
+        return p, q
+    return None, None
+
+# Main logic to read the file and factorize the number
+with open(argv[1], 'r') as f:
+    # Read the RSA number from the file
+    n = int(f.readline().strip())
     
-    # Only check up to the square root of the number
-    limit = int(math.sqrt(num)) + 1
-    for i in range(3, limit, 2):
-        if num % i == 0:
-            return (num // i, i)
+    # Find the prime factors p and q
+    p, q = find_prime_factors(n)
     
-    return (num, 1)  # Return the number itself if it is prime
+    if p and q:
+        print(f"{n}={p}*{q}")
+    else:
+        print(f"Could not find prime factors for {n}")
 
-start_time = time.time()
-
-with open(argv[1]) as f:
-    for line in f:
-        num = int(line)
-        print("{:d}=".format(num), end='')
-        
-        if num <= 1:
-            print(f"{num} is not valid for factorization")
-            continue
-        
-        factor1, factor2 = find_factors(num)
-        if factor2 == 1:
-            print(f"{num} is prime")
-        else:
-            print(f"{factor1}*{factor2}")

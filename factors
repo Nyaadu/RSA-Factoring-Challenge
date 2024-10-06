@@ -1,7 +1,16 @@
-#!/usr/bin/bash
-FILE=$1
-while read NUMBERS;
-do
-	factors=($(factor $NUMBERS))
-	echo "$NUMBERS=$(($NUMBERS/${factors[1]}))*${factors[1]}"
-done < $FILE
+#!/usr/bin/python3
+from sys import argv
+import math
+
+def find_two_factors(num):
+    # Start checking from 2 upwards, no need to check 1
+    for i in range(2, int(math.sqrt(num)) + 1):
+        if num % i == 0:
+            return i, num // i
+    return num, 1  # Fallback case for prime numbers (not needed here, per problem description)
+
+with open(argv[1], 'r') as f:
+    for line in f:
+        num = int(line.strip())  # Read and strip each line to get the number
+        factor1, factor2 = find_two_factors(num)
+        print(f"{num}={factor1}*{factor2}")
