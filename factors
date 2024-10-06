@@ -1,16 +1,32 @@
 #!/usr/bin/python3
-from sys import argv
-import math
 
-def find_two_factors(num):
-    # Start checking from 2 upwards, no need to check 1
-    for i in range(2, int(math.sqrt(num)) + 1):
-        if num % i == 0:
-            return i, num // i
-    return num, 1  # Fallback case for prime numbers (not needed here, per problem description)
+import sys
 
-with open(argv[1], 'r') as f:
-    for line in f:
-        num = int(line.strip())  # Read and strip each line to get the number
-        factor1, factor2 = find_two_factors(num)
-        print(f"{num}={factor1}*{factor2}")
+
+def factor(line):
+    number = int(line)
+    value = 0
+    if number < 4:
+        print("{:d}={:d}*1".format(number, number))
+        return
+    for i in range(2, number):
+        if number % i == 0:
+            value = number // i
+            break
+    print("{:d}={:d}*{:d}".format(number, value, i))
+
+
+if len(sys.argv) != 2:
+    print("Usage: factors <file>")
+    sys.exit()
+filename = sys.argv[1]
+try:
+    test = open(filename, "r")
+except FileNotFoundError:
+    print("Error: Can't open file <{:s}>".format(filename))
+    sys.exit()
+
+for line in test:
+    factor(line)
+
+test.close()

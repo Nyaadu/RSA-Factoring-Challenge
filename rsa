@@ -1,58 +1,31 @@
 #!/usr/bin/python3
-from sys import argv
-import math
-import random
 
-# Function to check if a number is prime
-def is_prime(num):
-    if num <= 1:
-        return False
-    if num == 2 or num == 3:
-        return True
-    if num % 2 == 0 or num % 3 == 0:
-        return False
-    for i in range(5, int(math.sqrt(num)) + 1, 6):
-        if num % i == 0 or num % (i + 2) == 0:
-            return False
-    return True
+import sys
 
-# Pollard's Rho Algorithm for finding a divisor
-def pollards_rho(n):
-    if n % 2 == 0:
-        return 2
-    x = random.randint(2, n - 1)
-    y = x
-    c = random.randint(1, n - 1)
-    d = 1
-    while d == 1:
-        x = (pow(x, 2, n) + c + n) % n
-        y = (pow(y, 2, n) + c + n) % n
-        y = (pow(y, 2, n) + c + n) % n
-        d = math.gcd(abs(x - y), n)
-        if d == n:
-            return pollards_rho(n)
-    return d
 
-# Function to find the prime factors p and q
-def find_prime_factors(n):
-    divisor = pollards_rho(n)
-    p = divisor
-    q = n // divisor
-    # Check if both factors are prime
-    if is_prime(p) and is_prime(q):
-        return p, q
-    return None, None
+def factor(line):
+    number = int(line)
+    value = 0
+    if number < 4:
+        print("{:d}={:d}*1".format(number, number))
+        return
+    for i in range(2, number):
+        if number % i == 0:
+            value = number // i
+            break
+    print("{:d}={:d}*{:d}".format(number, value, i))
 
-# Main logic to read the file and factorize the number
-with open(argv[1], 'r') as f:
-    # Read the RSA number from the file
-    n = int(f.readline().strip())
-    
-    # Find the prime factors p and q
-    p, q = find_prime_factors(n)
-    
-    if p and q:
-        print(f"{n}={p}*{q}")
-    else:
-        print(f"Could not find prime factors for {n}")
 
+if len(sys.argv) != 2:
+    print("Usage: factors <file>")
+    sys.exit()
+filename = sys.argv[1]
+try:
+    test = open(filename, "r")
+except FileNotFoundError:
+    print("Error: Can't open file <{:s}>".format(filename))
+    sys.exit()
+line = test.read()
+factor(line)
+
+test.close()
