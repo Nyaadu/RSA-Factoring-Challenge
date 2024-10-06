@@ -1,18 +1,33 @@
 #!/usr/bin/python3
 from sys import argv
+import math
+import time
+
+def find_factors(num):
+    if num % 2 == 0:
+        return (num // 2, 2)
+    
+    # Only check up to the square root of the number
+    limit = int(math.sqrt(num)) + 1
+    for i in range(3, limit, 2):
+        if num % i == 0:
+            return (num // i, i)
+    
+    return (num, 1)  # Return the number itself if it is prime
+
+start_time = time.time()
 
 with open(argv[1]) as f:
     for line in f:
-        num = int(line)	
+        num = int(line)
         print("{:d}=".format(num), end='')
-        if num % 2 == 0:
-            print("{}*2".format(num//2))
+        
+        if num <= 1:
+            print(f"{num} is not valid for factorization")
             continue
-        for i in range(3, num, 2):
-            if num % i == 0:
-                factor = num//i
-                for j in range(3, factor, 2):
-                    if factor % j == 0 or j == 0:
-                        break
-                print("{}*{}".format(factor, i))
-                break
+        
+        factor1, factor2 = find_factors(num)
+        if factor2 == 1:
+            print(f"{num} is prime")
+        else:
+            print(f"{factor1}*{factor2}")
