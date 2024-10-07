@@ -1,33 +1,46 @@
 #!/usr/bin/python3
-
-# library to get arguments
 import sys
+import math
+import random
 
+def is_prime(num):
+    if num <= 1:
+        return False
+    if num <= 3:
+        return True
+    if num % 2 == 0 or num % 3 == 0:
+        return False
+    for i in range(5, int(math.sqrt(num)) + 1, 6):
+        if num % i == 0 or num % (i + 2) == 0:
+            return False
+    return True
 
-# fn unpack number factorial
-def fc():
-    """
-    function fc to search file to convert number and format n=p*q
-    """
-    try:
-        revfile = sys.argv[1]
-        with open(revfile) as f:
-            for revnumber in f:
-                revnumber = int(revnumber)
-                if revnumber % 2 == 0:
-                        print("{}={}*{}".format(revnumber, revnumber // 2, 2))
-                        continue
-                i = 3
-                while i < revnumber // 2:
-                    if revnumber % i == 0:
-                        print("{}={}*{}".format(revnumber, revnumber // i, i))
-                        break
-                    i = i + 2
-                if i == (revnumber // 2) + 1:
-                    print("{}={}*{}".format(revnumber, revnumber, 1))
-    except (IndexError):
-        pass
+def pollards_rho(n):
+    if n % 2 == 0:
+        return 2
+    x = random.randint(2, n - 1)
+    y = x
+    c = random.randint(1, n - 1)
+    d = 1
+    while d == 1:
+        x = (x * x + c) % n
+        y = (y * y + c) % n
+        y = (y * y + c) % n
+        d = math.gcd(abs(x - y), n)
+        if d == n:
+            return pollards_rho(n)
+    return d
 
+def main(filename):
+    with open(filename, 'r') as f:
+        n = int(f.readline().strip())
+        p = pollards_rho(n)
+        q = n // p
+        
+        if is_prime(p) and is_prime(q):
+            print(f"{n}={p}*{q}")
+        else:
+            print(f"Could not find prime factors for {n}")
 
-# autostart
-fc()
+if __name__ == "__main__":
+    main(sys.argv[1])
